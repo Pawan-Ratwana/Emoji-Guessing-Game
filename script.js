@@ -12,14 +12,18 @@ const descriptionElement = document.getElementById('description');
 const guessInput = document.getElementById('guess-input');
 const resultElement = document.getElementById('result');
 const scoreElement = document.getElementById('score');
+const timerElement = document.getElementById('timer');
 
-// Variables to track current emoji index and score
+// Variables to track current emoji index, score, and timer
 let currentEmojiIndex = 0;
 let score = 0;
+let second = 30; // Initial time for timer
+let timer; // Timer variable
 
-// Function to display the current emoji
+// Function to display the current emoji and timer
 function displayEmoji() {
     descriptionElement.textContent = emojiDetails[currentEmojiIndex].emoji;
+    timerElement.textContent = `Time: ${second}s`;
 }
 
 // Function to check user's guess against the correct emoji description
@@ -30,7 +34,7 @@ function checkEmoji() {
     // Check if guess is correct
     if (guess === correctEmoji) {
         resultElement.textContent = 'Correct!';
-        score++; // Increment score if correct
+        score++;
     } else {
         resultElement.textContent = "False!";
     }
@@ -45,8 +49,15 @@ function checkEmoji() {
 // Function to move to the next emoji
 function nextEmoji() {
     currentEmojiIndex++;
+
+    // Clear result message after a delay
+    setTimeout(() => {
+        resultElement.textContent = '';
+    }, 1000);
+
+    // Reset currentEmojiIndex to loop back to the beginning
     if (currentEmojiIndex === emojiDetails.length) {
-        currentEmojiIndex = 0; // Loop back to the first emoji
+        currentEmojiIndex = 0;
     }
     displayEmoji(); // Display next emoji
 }
@@ -58,7 +69,26 @@ guessInput.addEventListener('keydown', (event) => {
     }
 });
 
+// Function to start the timer
+function startTimer() {
+    timer = setInterval(() => {
+        second--; // Decrease time by 1 second
+        timerElement.textContent = `Time: ${second}s`;
+        if (second <= 0) {
+            endTimer(); // End timer when time is up
+        }
+    }, 1000); // Timer ticks every second (1000 milliseconds)
+}
+
+// Function to end the timer
+function endTimer() {
+    clearInterval(timer); // Stop the timer
+    guessInput.disabled = true; // Disable input field when time is up
+    timerElement.textContent = ''; // Remove timer display
+}
+
 // Event listener for when the DOM content is loaded
 document.addEventListener('DOMContentLoaded', () => {
     displayEmoji(); // Display first emoji when page loads
+    startTimer(); // Start the timer
 });
